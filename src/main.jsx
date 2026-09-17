@@ -13,6 +13,7 @@ function App(){
  const [profile,setProfile]=useState(null); const [rows,setRows]=useState([]); const [loading,setLoading]=useState(false); const [error,setError]=useState(''); const [notice,setNotice]=useState('');
  const [username,setUsername]=useState(''); const [pin,setPin]=useState(''); const [amount,setAmount]=useState(null);
 
+ // লোকাল স্টোরেজ থেকে লগইন স্টেট ধরে রাখা যাতে রিফ্রেশ করলে লগআউট না হয়ে যায়
  useEffect(()=>{
   const savedProfile=localStorage.getItem('score_profile');
   if(savedProfile){
@@ -28,15 +29,17 @@ function App(){
   setRows(data||[]);
  }
 
+ // রিয়েলটাইম আপডেট সাবস্ক্রিপশন
  useEffect(()=>{
   if(!profile)return; 
   const ch=supabase.channel('score-live')
    .on('postgres_changes',{event:'*',schema:'public',table:'contributions'},()=>loadRows())
-   .on('postgres_changes',{event:'*',schema:'public',table:'profiles'},()=>loadRows())
+   .on('postgres_changes',{event:'*',schema:'public',table:'daily_state'},()=>loadRows())
    .subscribe(); 
   return()=>{supabase.removeChannel(ch)};
  },[profile]);
 
+ // কাস্টম পিন ও ইউজারনেম দিয়ে লগইন লজিক
  async function login(e){
   e.preventDefault();
   setError('');
@@ -66,6 +69,7 @@ function App(){
   setLoading(true);
   setError(''); 
   
+  // এখানে profile.id পাস করা হয়েছে যাতে ব্যাকএন্ড চিনতে পারে কে কন্ট্রিবিউট করছে
   const {error} = await supabase.rpc('make_contribution', { 
     p_user_id: profile.id, 
     p_amount: amount 
@@ -89,10 +93,7 @@ function App(){
  async function resetDay(){
   if(!confirm('Reset today? This clears today\'s contribution board.'))return;
   setLoading(true);
-  setError('');
-  
-  const {error} = await supabase.rpc('reset_today');
-  
+  const {error}=await supabase.rpc('reset_today');
   if(error) {
    setError(error.message);
   } else {
