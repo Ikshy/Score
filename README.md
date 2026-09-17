@@ -3,7 +3,6 @@ Private, mobile-first daily contribution board for up to 8 users + 1 admin.
 
 ### Rules
 - User: username + 4-digit PIN (the app internally maps this to a Supabase Auth password; the PIN is never stored as plain text in the browser).
-- Admin PIN: `20365`.
 - Amounts: ৳10 / ৳20 / ৳30 / ৳50.
 - One contribution per user per Bangladesh calendar day.
 - Before contributing, the user sees no amounts or total.
@@ -22,9 +21,6 @@ Private, mobile-first daily contribution board for up to 8 users + 1 admin.
 7. Test with `npm run dev`.
 
 **Never upload the service-role key or `.env.local` to GitHub/Vercel.**
-
-### GitHub
-`git init` → `git add .` → `git commit -m "Initial SCORE app"` → create an empty GitHub repo → `git remote add origin YOUR_REPO_URL` → `git branch -M main` → `git push -u origin main`.
 
 ### Vercel
 Import the GitHub repo, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment variables, then deploy.
